@@ -1,0 +1,64 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php
+<br></span><span style="color: #FF8000">//&nbsp;ini_set("display_errors",&nbsp;"On");
+<br>//&nbsp;error_reporting(E_ALL&nbsp;|&nbsp;E_STRICT);
+<br>
+<br>
+<br></span><span style="color: #007700">function&nbsp;</span><span style="color: #0000BB">safe_url</span><span style="color: #007700">(</span><span style="color: #0000BB">$url</span><span style="color: #007700">,</span><span style="color: #0000BB">$safe</span><span style="color: #007700">)&nbsp;{
+<br>&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$parsed&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">parse_url</span><span style="color: #007700">(</span><span style="color: #0000BB">$url</span><span style="color: #007700">);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$validate_ip&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">$parsed</span><span style="color: #007700">[</span><span style="color: #DD0000">'port'</span><span style="color: #007700">]&nbsp;&nbsp;&amp;&amp;&nbsp;!</span><span style="color: #0000BB">in_array</span><span style="color: #007700">(</span><span style="color: #0000BB">$parsed</span><span style="color: #007700">[</span><span style="color: #DD0000">'port'</span><span style="color: #007700">],array(</span><span style="color: #DD0000">'80'</span><span style="color: #007700">,</span><span style="color: #DD0000">'443'</span><span style="color: #007700">))){
+<br>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;echo&nbsp;</span><span style="color: #DD0000">"&lt;b&gt;请求错误:非正常端口,因安全问题只允许抓取80,443端口的链接,如有特殊需求请自行修改程序&lt;/b&gt;"</span><span style="color: #007700">.</span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;}else{
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">preg_match</span><span style="color: #007700">(</span><span style="color: #DD0000">'/^\d+$/'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$parsed</span><span style="color: #007700">[</span><span style="color: #DD0000">'host'</span><span style="color: #007700">])&nbsp;&amp;&amp;&nbsp;</span><span style="color: #0000BB">$parsed</span><span style="color: #007700">[</span><span style="color: #DD0000">'host'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">long2ip</span><span style="color: #007700">(</span><span style="color: #0000BB">$parsed</span><span style="color: #007700">[</span><span style="color: #DD0000">'host'</span><span style="color: #007700">]);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$long&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">ip2long</span><span style="color: #007700">(</span><span style="color: #0000BB">$parsed</span><span style="color: #007700">[</span><span style="color: #DD0000">'host'</span><span style="color: #007700">]);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">$long</span><span style="color: #007700">===</span><span style="color: #0000BB">false</span><span style="color: #007700">){
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$ip&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span><span style="color: #007700">;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">$safe</span><span style="color: #007700">){
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@</span><span style="color: #0000BB">putenv</span><span style="color: #007700">(</span><span style="color: #DD0000">'RES_OPTIONS=retrans:1&nbsp;retry:1&nbsp;timeout:1&nbsp;attempts:1'</span><span style="color: #007700">);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$ip&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">gethostbyname</span><span style="color: #007700">(</span><span style="color: #0000BB">$parsed</span><span style="color: #007700">[</span><span style="color: #DD0000">'host'</span><span style="color: #007700">]);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$long&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">ip2long</span><span style="color: #007700">(</span><span style="color: #0000BB">$ip</span><span style="color: #007700">);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$long</span><span style="color: #007700">===</span><span style="color: #0000BB">false&nbsp;</span><span style="color: #007700">&amp;&amp;&nbsp;</span><span style="color: #0000BB">$ip&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span><span style="color: #007700">;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@</span><span style="color: #0000BB">putenv</span><span style="color: #007700">(</span><span style="color: #DD0000">'RES_OPTIONS'</span><span style="color: #007700">);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}else{
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$ip&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$parsed</span><span style="color: #007700">[</span><span style="color: #DD0000">'host'</span><span style="color: #007700">];
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$ip&nbsp;</span><span style="color: #007700">&amp;&amp;&nbsp;</span><span style="color: #0000BB">$validate_ip&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">filter_var</span><span style="color: #007700">(</span><span style="color: #0000BB">$ip</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">FILTER_VALIDATE_IP</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">FILTER_FLAG_NO_PRIV_RANGE&nbsp;</span><span style="color: #007700">|&nbsp;</span><span style="color: #0000BB">FILTER_FLAG_NO_RES_RANGE</span><span style="color: #007700">);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;}
+<br>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;if(!</span><span style="color: #0000BB">in_array</span><span style="color: #007700">(</span><span style="color: #0000BB">$parsed</span><span style="color: #007700">[</span><span style="color: #DD0000">'scheme'</span><span style="color: #007700">],array(</span><span style="color: #DD0000">'http'</span><span style="color: #007700">,</span><span style="color: #DD0000">'https'</span><span style="color: #007700">))&nbsp;||&nbsp;!</span><span style="color: #0000BB">$validate_ip</span><span style="color: #007700">){
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;echo&nbsp;</span><span style="color: #DD0000">"&lt;b&gt;</span><span style="color: #007700">{</span><span style="color: #0000BB">$url</span><span style="color: #007700">}</span><span style="color: #DD0000">&nbsp;请求错误:非正常URL格式,因安全问题只允许抓取&nbsp;http://&nbsp;或&nbsp;https://&nbsp;开头的链接或公有IP地址&lt;/b&gt;"</span><span style="color: #007700">.</span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;}else{
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$url</span><span style="color: #007700">;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;}
+<br>}
+<br>
+<br>
+<br>function&nbsp;</span><span style="color: #0000BB">curl</span><span style="color: #007700">(</span><span style="color: #0000BB">$url</span><span style="color: #007700">){
+<br>&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$safe&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">safe_url</span><span style="color: #007700">(</span><span style="color: #0000BB">$url</span><span style="color: #007700">,</span><span style="color: #0000BB">$safe</span><span style="color: #007700">))&nbsp;{
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$ch&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">curl_init</span><span style="color: #007700">();
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">curl_setopt</span><span style="color: #007700">(</span><span style="color: #0000BB">$ch</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">CURLOPT_URL</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$url</span><span style="color: #007700">);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">curl_setopt</span><span style="color: #007700">(</span><span style="color: #0000BB">$ch</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">CURLOPT_RETURNTRANSFER</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">1</span><span style="color: #007700">);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">curl_setopt</span><span style="color: #007700">(</span><span style="color: #0000BB">$ch</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">CURLOPT_HEADER</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">0</span><span style="color: #007700">);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">curl_setopt</span><span style="color: #007700">(</span><span style="color: #0000BB">$ch</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">CURLOPT_SSL_VERIFYPEER</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">curl_setopt</span><span style="color: #007700">(</span><span style="color: #0000BB">$ch</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">CURLOPT_SSL_VERIFYHOST</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$co&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">curl_exec</span><span style="color: #007700">(</span><span style="color: #0000BB">$ch</span><span style="color: #007700">);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">curl_close</span><span style="color: #007700">(</span><span style="color: #0000BB">$ch</span><span style="color: #007700">);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;echo&nbsp;</span><span style="color: #0000BB">$co</span><span style="color: #007700">;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;}
+<br>}
+<br>
+<br></span><span style="color: #0000BB">highlight_file</span><span style="color: #007700">(</span><span style="color: #0000BB">__FILE__</span><span style="color: #007700">);
+<br></span><span style="color: #0000BB">curl</span><span style="color: #007700">(</span><span style="color: #0000BB">$_GET</span><span style="color: #007700">[</span><span style="color: #DD0000">'url'</span><span style="color: #007700">]);
+<br></span>
+</span>
+</code><b> 请求错误:非正常URL格式,因安全问题只允许抓取 http:// 或 https:// 开头的链接或公有IP地址</b>
+</body></html>
